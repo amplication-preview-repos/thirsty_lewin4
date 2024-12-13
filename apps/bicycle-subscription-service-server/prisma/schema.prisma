@@ -1,0 +1,83 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model SubscriptionPlan {
+  createdAt      DateTime @default(now())
+  description    String?
+  durationMonths Int?
+  id             String   @id @default(cuid())
+  name           String?
+  price          Float?
+  updatedAt      DateTime @updatedAt
+}
+
+model Subscription {
+  bicycle   Bicycle?                @relation(fields: [bicycleId], references: [id])
+  bicycleId String?
+  createdAt DateTime                @default(now())
+  customer  String?
+  endDate   DateTime?
+  id        String                  @id @default(cuid())
+  payments  Payment[]
+  startDate DateTime?
+  status    EnumSubscriptionStatus?
+  updatedAt DateTime                @updatedAt
+}
+
+model Payment {
+  amount         Float?
+  createdAt      DateTime           @default(now())
+  id             String             @id @default(cuid())
+  method         EnumPaymentMethod?
+  paymentDate    DateTime?
+  status         EnumPaymentStatus?
+  subscription   Subscription?      @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
+  updatedAt      DateTime           @updatedAt
+}
+
+model Bicycle {
+  createdAt     DateTime           @default(now())
+  id            String             @id @default(cuid())
+  location      Location?          @relation(fields: [locationId], references: [id])
+  locationId    String?
+  model         String?
+  serialNumber  String?
+  status        EnumBicycleStatus?
+  subscriptions Subscription[]
+  updatedAt     DateTime           @updatedAt
+}
+
+model Location {
+  address   String?
+  bicycles  Bicycle[]
+  city      String?
+  createdAt DateTime  @default(now())
+  id        String    @id @default(cuid())
+  name      String?
+  state     String?
+  updatedAt DateTime  @updatedAt
+  zipCode   String?
+}
+
+enum EnumSubscriptionStatus {
+  Option1
+}
+
+enum EnumPaymentMethod {
+  Option1
+}
+
+enum EnumPaymentStatus {
+  Option1
+}
+
+enum EnumBicycleStatus {
+  Option1
+}
